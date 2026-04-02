@@ -1,0 +1,10 @@
+{
+  "/page": "app/page.js",
+  "/attack-chains/page": "app/attack-chains/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/experiment/page": "app/experiment/page.js",
+  "/aifw/page": "app/aifw/page.js",
+  "/agent/page": "app/agent/page.js",
+  "/mutator/page": "app/mutator/page.js",
+  "/targetzone/page": "app/targetzone/page.js"
+}

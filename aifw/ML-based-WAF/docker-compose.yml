@@ -1,0 +1,33 @@
+services:
+  aifw:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vulhub-aifw
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.route_localnet=1
+    environment:
+      - TZ=Asia/Shanghai
+      - MODSEC_RULE_ENGINE=${MODSEC_RULE_ENGINE:-DetectionOnly}
+    ports:
+      - "9999:9999"
+      - "10001-10010:10001-10010"
+    networks:
+      vulhub_net_dmz_a:
+        ipv4_address: 192.168.6.254
+      vulhub_net_db_b:
+        ipv4_address: 192.168.5.254
+    restart: unless-stopped
+    labels:
+      - "com.vulhub.role=aifw"
+
+networks:
+  vulhub_net_dmz_a:
+    external: true
+  vulhub_net_db_b:
+    external: true
