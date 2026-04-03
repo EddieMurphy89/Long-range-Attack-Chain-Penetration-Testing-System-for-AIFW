@@ -36,6 +36,90 @@ export interface InterceptRule {
     local_port: number;
 }
 
+export interface VulnInfo {
+    app: string;
+    cve: string;
+    path: string;
+    description?: string;
+}
+
+export interface NetworkInfo {
+    id: string;
+    name: string;
+    subnet?: string;
+    driver: string;
+}
+
+export interface ContainerInfo {
+    name: string;
+    status: string;
+    ports?: string[];
+    ips?: string[];
+}
+
+export interface ContainerStatus {
+    running: boolean;
+    containers?: ContainerInfo[];
+    start_task?: {
+        state?: string;
+        message?: string;
+    };
+}
+
+export interface ExperimentScenarioStats {
+    scenario_id: string;
+    component: string;
+    version: string;
+    query_key: string;
+    category: string;
+    chain_length?: number;
+    attack_goal?: string;
+    pov_builder?: string;
+    exp_builder?: string;
+    aifw_bypass_strategy?: string;
+    pov_results: boolean[];
+    exp_results: boolean[];
+    aifw_bypass_results: boolean[];
+    pov_success: number;
+    pov_total: number;
+    pov_rate: number;
+    exp_success: number;
+    exp_total: number;
+    exp_rate: number;
+    aifw_bypass_success: number;
+    aifw_bypass_total: number;
+    aifw_bypass_rate: number;
+}
+
+export interface ExperimentCategoryStats {
+    pov_success: number;
+    pov_total: number;
+    pov_rate: number;
+    exp_success: number;
+    exp_total: number;
+    exp_rate: number;
+    aifw_bypass_success: number;
+    aifw_bypass_total: number;
+    aifw_bypass_rate: number;
+}
+
+export interface ExperimentStats {
+    pov_overall: { success: number; total: number; rate: number };
+    exp_overall: { success: number; total: number; rate: number };
+    aifw_bypass_overall: { success: number; total: number; rate: number };
+    scenario_count: number;
+    total_runs: number;
+    by_category: Record<string, ExperimentCategoryStats>;
+    by_scenario: ExperimentScenarioStats[];
+}
+
+export interface ExperimentLookupResponse {
+    found: boolean;
+    query_key: string;
+    data: ExperimentScenarioStats | null;
+    suggestions: string[];
+}
+
 // ── Generic Fetcher ───────────────────────────────────────────
 export async function fetcher<T = any>(url: string): Promise<T> {
     const res = await fetch(url);
@@ -244,7 +328,17 @@ export async function fetchExperimentResults(): Promise<any[]> {
     return res?.data || [];
 }
 
-export async function fetchExperimentStats(): Promise<any> {
+export async function fetchExperimentStats(): Promise<ExperimentStats> {
     const res = await fetcher(`${API_BASE}/experiment/stats`);
     return res?.data || {};
+}
+
+export async function fetchExperimentLookup(queryKey: string): Promise<ExperimentLookupResponse> {
+    const res = await fetcher(`${API_BASE}/experiment/lookup?query_key=${encodeURIComponent(queryKey)}`);
+    return {
+        found: res?.found || false,
+        query_key: res?.query_key || queryKey,
+        data: res?.data || null,
+        suggestions: res?.suggestions || [],
+    };
 }

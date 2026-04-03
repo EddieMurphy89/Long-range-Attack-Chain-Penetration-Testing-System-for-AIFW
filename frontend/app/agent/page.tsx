@@ -200,7 +200,7 @@ export default function AgentPage() {
                         AI Payload Generator
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400">
-                        Automatically synthesize exploit scripts by analyzing local Vulhub documentation.
+                        基于本地 Vulhub 文档与漏洞上下文，自动生成可执行的攻击脚本与 Payload。
                     </p>
                 </div>
                 <button

@@ -242,8 +242,8 @@ export default function MutatorPage() {
                 </div>
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Payload Mutator</h1>
-                    <p className="text-slate-600 dark:text-slate-400 mt-1">
-                        Transform primitive payloads using advanced AIFW bypass techniques or AI jailbreak forms.
+                    <p className="text-slate-500 dark:text-slate-400 mt-1">
+                        通过 AIFW 绕过技巧与 AI 越狱变体，对原始 Payload 进行自动变异与增强。
                     </p>
                 </div>
             </div>

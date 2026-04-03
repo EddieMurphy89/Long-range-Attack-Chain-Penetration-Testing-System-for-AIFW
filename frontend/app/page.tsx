@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import VulnCard from '@/components/VulnCard';
 import VulnModal from '@/components/VulnModal';
 import { VulnInfo } from '@/lib/api';
-import { Search } from 'lucide-react';
+import { Search, ShieldAlert } from 'lucide-react';
 
 export default function Home() {
   const [vulns, setVulns] = useState<VulnInfo[]>([]);
@@ -34,8 +34,13 @@ export default function Home() {
     <div className="container mx-auto px-4 py-8">
       {/* Search Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Vulnerabilities</h1>
-        <p className="text-slate-500 dark:text-slate-400 mb-6">Select a vulnerability environment to deploy.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2 flex items-center gap-3">
+          <span className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300">
+            <ShieldAlert className="w-6 h-6" />
+          </span>
+          Vulnerabilities
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400 mb-6">选择需要部署的漏洞靶场环境，并按组件或 CVE 编号快速检索目标样本。</p>
         
         <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />

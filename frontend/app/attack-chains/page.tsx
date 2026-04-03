@@ -307,8 +307,8 @@ export default function AttackChainsPage() {
                         <Workflow className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                         Attack Chains Library
                     </h1>
-                    <p className="text-slate-600 dark:text-slate-400 mt-2">
-                        Collection of automated attack chain scripts categorized by vulnerability type.
+                    <p className="text-slate-500 dark:text-slate-400 mt-2">
+                        按漏洞类型归档自动化攻击链脚本，支持检索、编辑、执行与复用利用流程。
                     </p>
                 </div>
             </header>

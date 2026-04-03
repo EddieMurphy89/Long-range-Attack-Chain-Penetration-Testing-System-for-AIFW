@@ -477,12 +477,12 @@ export default function AIFWPage() {
             {/* ═══ Header ═══════════════════════════════════════════ */}
             <div className="mb-8">
                 <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/20">
+                    <span className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-300">
                         <Shield className="w-6 h-6" />
-                    </div>
+                    </span>
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">AI Firewall</h1>
-                        <p className="text-slate-500 dark:text-slate-400">Network layer transparent traffic interception and intelligent analysis firewall middleware</p>
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">AI Firewall</h1>
+                        <p className="text-slate-500 dark:text-slate-400">提供网络层透明流量拦截、智能分析与防护策略联动的 AI 防火墙中间件能力。</p>
                     </div>
                 </div>
             </div>
