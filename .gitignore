@@ -1,0 +1,10 @@
+# Frontend build artifacts and dependencies
+frontend/.next/
+frontend/node_modules/
+
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Local vector database
+.chroma_db/

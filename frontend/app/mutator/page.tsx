@@ -193,7 +193,7 @@ export default function MutatorPage() {
         setError(null);
 
         try {
-            const response = await fetch("http://localhost:8000/api/mutator/mutate", {
+            const response = await fetch("/api/mutator/mutate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

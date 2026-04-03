@@ -1,6 +1,5 @@
-
-import os
 import logging
+import os
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -12,64 +11,46 @@ DEFAULT_DB_SUBNET = "192.168.5.0/24"
 NET_DMZ_NAME = "vulhub_net_dmz_a"
 NET_DB_NAME = "vulhub_net_db_b"
 
-# Configuration
-# Assuming backend/app/core/config.py -> root is 3 levels up from app (vulhub-manager/backend/app/core -> backend/app -> backend -> vulhub-manager)
-# Wait: 
-# __file__ = backend/app/core/config.py
-# dirname = backend/app/core
-# dirname = backend/app
-# dirname = backend
-# dirname = vulhub-manager
-# dirname = workspace (if vulhub is sibling)
+# Project layout
+CONFIG_DIR = os.path.dirname(os.path.abspath(__file__))
+BACKEND_ROOT = os.path.abspath(os.path.join(CONFIG_DIR, "..", ".."))
+PROJECT_ROOT = os.path.abspath(os.path.join(BACKEND_ROOT, ".."))
+WORKSPACE_ROOT = os.path.dirname(PROJECT_ROOT)
 
-# In original main.py:
-# WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# main.py was in backend/main.py. 
-# backend/main.py -> backend -> vulhub-manager -> workspace
-# So 3 levels up.
+def _resolve_path(env_var_name: str, *candidates: str) -> str:
+    override = os.getenv(env_var_name)
+    if override:
+        return os.path.abspath(override)
 
-# Now config.py is in backend/app/core/config.py
-# backend/app/core/config.py -> backend/app/core -> backend/app -> backend -> vulhub-manager -> workspace
-# So 5 levels up?
-# Let's count dirs.
-# 1. os.path.abspath(__file__) -> config.py
-# 2. dirname -> core
-# 3. dirname -> app
-# 4. dirname -> backend
-# 5. dirname -> vulhub-manager
-# 6. dirname -> workspace (where vulhub probably is effectively 'sibling' to vulhub-manager or inside) 
+    normalized = [os.path.abspath(candidate) for candidate in candidates if candidate]
+    for candidate in normalized:
+        if os.path.exists(candidate):
+            return candidate
 
-# Re-read original main.py logic:
-# WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-# main.py is in backend/
-# 1. backend
-# 2. vulhub-manager (containing backend)
-# 3. workspace (containing vulhub-manager)
-# VULHUB_ROOT = join(WORKSPACE_ROOT, "vulhub")
+    return normalized[0] if normalized else ""
 
-# So if config.py is in backend/app/core/
-# 1. core
-# 2. app
-# 3. backend
-# 4. vulhub-manager
-# 5. workspace
-
-WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
-VULHUB_ROOT = os.path.join(WORKSPACE_ROOT, "vulhub")
+# Resource roots
+VULHUB_ROOT = _resolve_path(
+    "VULHUB_ROOT",
+    os.path.join(PROJECT_ROOT, "vulhub"),
+    os.path.join(WORKSPACE_ROOT, "vulhub"),
+)
+ATTACK_CHAINS_ROOT = _resolve_path("ATTACK_CHAINS_ROOT", os.path.join(PROJECT_ROOT, "attack-chains"))
+AIFW_ROOT = _resolve_path("AIFW_ROOT", os.path.join(PROJECT_ROOT, "aifw"))
+CHROMA_DB_DIR = _resolve_path("CHROMA_DB_DIR", os.path.join(PROJECT_ROOT, ".chroma_db"))
 
 if not os.path.exists(VULHUB_ROOT):
     logger.warning(f"Vulhub root not found at {VULHUB_ROOT}. Please check path.")
 
-ATTACK_CHAINS_ROOT = os.path.join(WORKSPACE_ROOT, "vulhub-manager", "attack-chains")
 if not os.path.exists(ATTACK_CHAINS_ROOT):
     logger.warning(f"Attack chains root not found at {ATTACK_CHAINS_ROOT}.")
 
-AIFW_ROOT = os.path.join(WORKSPACE_ROOT, "vulhub-manager", "aifw")
 if not os.path.exists(AIFW_ROOT):
     logger.warning(f"AIFW root not found at {AIFW_ROOT}.")
-    
+
 # Go Configuration
-GO_ROOT = os.getenv("GOROOT", r"F:\Go_1.23.3")
+# Prefer an explicit GOROOT when provided; otherwise rely on `go` from PATH.
+GO_ROOT = os.getenv("GOROOT", "") # r"F:\Go_1.23.3"
 
 # LLM Configuration
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")

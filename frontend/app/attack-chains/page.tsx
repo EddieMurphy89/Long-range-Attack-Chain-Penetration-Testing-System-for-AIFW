@@ -18,8 +18,16 @@ interface ExecResult {
     returncode: number;
 }
 
+interface VulnInfo {
+    app: string;
+    cve: string;
+    path: string;
+    description: string;
+}
+
 export default function AttackChainsPage() {
     const [pocs, setPocs] = useState<AttackChainPoc[]>([]);
+    const [vulns, setVulns] = useState<VulnInfo[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedPoc, setSelectedPoc] = useState<AttackChainPoc | null>(null);
     const [loadingContent, setLoadingContent] = useState(false);
@@ -73,10 +81,13 @@ export default function AttackChainsPage() {
     };
 
     useEffect(() => {
-        fetch('/api/attack-chains')
-            .then(res => res.json())
-            .then(data => {
-                setPocs(data);
+        Promise.all([
+            fetch('/api/attack-chains').then(res => res.json()),
+            fetch('/api/vulns').then(res => res.json()).catch(() => []),
+        ])
+            .then(([attackChains, vulnList]) => {
+                setPocs(attackChains);
+                setVulns(Array.isArray(vulnList) ? vulnList : []);
                 setLoading(false);
             })
             .catch(err => {
@@ -91,67 +102,62 @@ export default function AttackChainsPage() {
 
         const checkEnvStatus = async () => {
             try {
-                // Try to map category/name to path. 
-                // In vulhub, path is usually app/cve.
-                // category is often app name, name is cve.
-                const path = `${selectedPoc.category}/${selectedPoc.name}`;
-                const res = await fetch(`/api/vulns/status?path=${path}`);
-                if (res.ok) {
-                    const status = await res.json();
-                    if (status.running && status.containers && status.containers.length > 0) {
-                        let targetIp = '<target_ip>';
-                        let targetPort = '<port>';
+                const matchingVuln = vulns.find(vuln => vuln.cve === selectedPoc.name);
+                if (!matchingVuln?.path) {
+                    return;
+                }
 
-                        // Find IP in DMZ subnet (192.168.6.x)
-                        for (const c of status.containers) {
-                            // Check IPs
-                            if (c.ips) {
-                                for (const ipStr of c.ips) {
-                                    // Format: "network: ip"
-                                    const match = ipStr.match(/(\d+\.\d+\.\d+\.\d+)/);
-                                    if (match) {
-                                        const ip = match[1];
-                                        if (ip.startsWith('192.168.6.')) {
-                                            targetIp = ip;
+                const res = await fetch(`/api/vulns/status?path=${encodeURIComponent(matchingVuln.path)}`);
+                if (!res.ok) {
+                    return;
+                }
 
-                                            // Once we found the main container (DMZ), try to find its port
-                                            if (c.ports && c.ports.length > 0) {
-                                                // Format: "0.0.0.0:2222 -> 2222/tcp"
-                                                // We want the internal port (right side)
-                                                for (const pStr of c.ports) {
-                                                    if (pStr.includes('->')) {
-                                                        const parts = pStr.split('->');
-                                                        if (parts.length > 1) {
-                                                            // " 2222/tcp" -> "2222"
-                                                            targetPort = parts[1].trim().split('/')[0];
-                                                            break; // Use the first mapped port
-                                                        }
+                const status = await res.json();
+                if (status.running && status.containers && status.containers.length > 0) {
+                    let targetIp = '<target_ip>';
+                    let targetPort = '<port>';
+
+                    // Find IP in DMZ subnet (192.168.6.x)
+                    for (const c of status.containers) {
+                        if (c.ips) {
+                            for (const ipStr of c.ips) {
+                                const match = ipStr.match(/(\d+\.\d+\.\d+\.\d+)/);
+                                if (match) {
+                                    const ip = match[1];
+                                    if (ip.startsWith('192.168.6.')) {
+                                        targetIp = ip;
+
+                                        if (c.ports && c.ports.length > 0) {
+                                            for (const pStr of c.ports) {
+                                                if (pStr.includes('->')) {
+                                                    const parts = pStr.split('->');
+                                                    if (parts.length > 1) {
+                                                        targetPort = parts[1].trim().split('/')[0];
+                                                        break;
                                                     }
                                                 }
                                             }
-                                            break;
                                         }
+                                        break;
                                     }
                                 }
                             }
-                            if (targetIp !== '<target_ip>') break;
                         }
+                        if (targetIp !== '<target_ip>') break;
+                    }
 
-                        // Fill placeholder
-                        const hints = getCategoryHints(selectedPoc.category);
-                        let filled = hints.placeholder;
+                    const hints = getCategoryHints(selectedPoc.category);
+                    let filled = hints.placeholder;
 
-                        if (targetIp !== '<target_ip>') {
-                            filled = filled.replace(/<target_ip>/g, targetIp);
-                        }
-                        if (targetPort !== '<port>') {
-                            filled = filled.replace(/<port>/g, targetPort);
-                        }
+                    if (targetIp !== '<target_ip>') {
+                        filled = filled.replace(/<target_ip>/g, targetIp);
+                    }
+                    if (targetPort !== '<port>') {
+                        filled = filled.replace(/<port>/g, targetPort);
+                    }
 
-                        // If we found variables, set args
-                        if (filled !== hints.placeholder) {
-                            setRunArgs(filled);
-                        }
+                    if (filled !== hints.placeholder) {
+                        setRunArgs(filled);
                     }
                 }
             } catch (e) {
@@ -160,7 +166,7 @@ export default function AttackChainsPage() {
         };
 
         checkEnvStatus();
-    }, [selectedPoc]);
+    }, [selectedPoc, vulns]);
 
     const [goOS, setGoOS] = useState('linux');
     const [goArch, setGoArch] = useState('amd64');

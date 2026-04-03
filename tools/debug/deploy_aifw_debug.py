@@ -2,8 +2,12 @@ import sys
 import os
 import logging
 
+DEBUG_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(DEBUG_DIR, "..", ".."))
+BACKEND_ROOT = os.path.join(PROJECT_ROOT, "backend")
+
 # Add backend to sys.path
-sys.path.append("g:/backups/本科毕设/workspace/vulhub-manager/backend")
+sys.path.insert(0, BACKEND_ROOT)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

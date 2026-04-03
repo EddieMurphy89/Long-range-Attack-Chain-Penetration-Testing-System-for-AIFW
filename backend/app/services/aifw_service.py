@@ -114,9 +114,8 @@ def deploy_aifw() -> Dict[str, Any]:
         env["AIFW_PORT"] = aifw_port
         env["MODSEC_RULE_ENGINE"] = mode
 
-        from app.core.config import WORKSPACE_ROOT
-        modsec_dir = os.path.join(WORKSPACE_ROOT, "vulhub-manager", "aifw", "modsecurity")
-        waf_brain_dir = os.path.join(WORKSPACE_ROOT, "vulhub-manager", "aifw", "waf-brain")
+        modsec_dir = os.path.join(AIFW_ROOT, "modsecurity")
+        waf_brain_dir = os.path.join(AIFW_ROOT, "waf-brain")
         
         # Stop any existing container (both types just to be safe)
         if os.path.exists(modsec_dir):

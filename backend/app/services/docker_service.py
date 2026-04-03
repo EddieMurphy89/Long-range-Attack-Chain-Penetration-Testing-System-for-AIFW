@@ -490,17 +490,28 @@ def _infer_zone_from_workdir(working_dir: str) -> Optional[str]:
     return None
 
 def _extract_cve_from_path(path: str) -> Dict[str, str]:
-    if not path: return {}
-    parts = path.replace('\\', '/').strip('/').split('/')
+    if not path:
+        return {}
+
+    abs_path = os.path.abspath(path)
+
     try:
-        if 'vulhub' in parts:
-            idx = parts.index('vulhub')
-            if len(parts) > idx + 2:
-                return {"app": parts[idx+1], "cve": parts[idx+2]}
-        if parts[-1].upper().startswith("CVE-"):
-             return {"app": parts[-2], "cve": parts[-1]}
-    except:
+        rel_path = os.path.relpath(abs_path, VULHUB_ROOT)
+        if not rel_path.startswith(".."):
+            rel_parts = rel_path.replace("\\", "/").strip("/").split("/")
+            if len(rel_parts) >= 2:
+                return {"app": rel_parts[0], "cve": rel_parts[1]}
+    except Exception:
         pass
+
+    parts = abs_path.replace("\\", "/").strip("/").split("/")
+    try:
+        for idx in range(len(parts) - 1):
+            if parts[idx + 1].upper().startswith("CVE-"):
+                return {"app": parts[idx], "cve": parts[idx + 1]}
+    except Exception:
+        pass
+
     return {}
 
 TOOLS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../tools"))

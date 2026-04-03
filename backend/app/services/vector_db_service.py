@@ -3,11 +3,14 @@ import glob
 from chromadb import PersistentClient
 from chromadb.utils import embedding_functions
 from langchain_text_splitters import MarkdownTextSplitter
-from app.core.config import logger, VULHUB_ROOT, OPENAI_API_KEY, OPENAI_BASE_URL, WORKSPACE_ROOT
+from app.core.config import (
+    CHROMA_DB_DIR,
+    OPENAI_API_KEY,
+    OPENAI_BASE_URL,
+    VULHUB_ROOT,
+    logger,
+)
 from typing import List, Dict
-
-# ChromaDB storage path
-CHROMA_DB_DIR = os.path.join(WORKSPACE_ROOT, "vulhub-manager", ".chroma_db")
 
 class VectorDBService:
     def __init__(self):

@@ -3,6 +3,10 @@ import json
 import os
 import sys
 
+DEBUG_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(DEBUG_DIR, "..", ".."))
+STATE_FILE = os.path.join(PROJECT_ROOT, "backend", "app", "services", "aifw_state.json")
+
 def run_cmd(cmd):
     try:
         res = subprocess.run(cmd, shell=True, capture_output=True, text=True, encoding='utf-8')
@@ -21,9 +25,8 @@ def check_aifw_status():
 
 def check_state_file():
     print("[-] Checking backend state file...")
-    path = "g:/backups/本科毕设/workspace/vulhub-manager/backend/app/services/aifw_state.json"
-    if os.path.exists(path):
-        with open(path, 'r', encoding='utf-8') as f:
+    if os.path.exists(STATE_FILE):
+        with open(STATE_FILE, 'r', encoding='utf-8') as f:
             print(f"    [*] Content: {f.read()}")
     else:
         print("    [!] State file not found")
@@ -64,7 +67,7 @@ if __name__ == "__main__":
 
     # Load state to find a port to test
     try:
-        with open("g:/backups/本科毕设/workspace/vulhub-manager/backend/app/services/aifw_state.json", 'r', encoding='utf-8') as f:
+        with open(STATE_FILE, 'r', encoding='utf-8') as f:
             state = json.load(f)
             rules = state.get("rules", {})
             print(f"[-] Active Rules: {json.dumps(rules, indent=2)}")
@@ -96,4 +99,3 @@ if __name__ == "__main__":
 
     except Exception as e:
         print(f"[!] Failed to load state or test: {e}")
-
