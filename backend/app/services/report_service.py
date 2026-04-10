@@ -150,9 +150,32 @@ async def generate_attack_report(
 - 漏洞原理简述
 - 攻击利用方式
 
-## 5. MITRE ATT&CK 战术与技术分析
+## 5. MITRE ATT&CK® 战术与技术映射（结构化展示）
 
-结合本次攻击链，映射并分析涉及的 MITRE ATT&CK 战术 (Tactics) 和技术 (Techniques)，说明攻击者在各个阶段使用的具体核心手法，并提供对应的技术编号（如 T1190, T1059 等）。
+本章节须体现与 **MITRE ATT&CK for Enterprise** 的对照，便于论文/答辩中的「威胁建模与攻击阶段归类」表述。须同时包含 **表格展示** 与 **简要文字分析**，不得仅用一段话笼统概括。
+
+### 5.1 ATT&CK 映射总表（必填）
+
+使用 Markdown 表格，按攻击时间顺序或拓扑推进顺序逐行映射，至少包含以下列（列名须保留）：
+
+| 步骤 | 攻击链中的动作/节点（简述） | ATT&CK 战术（中文名） | 战术 ID (TAxxxx) | 技术（中文名） | 技术 ID (Txxxx 或 Txxxx.xxx) | 映射依据（与 CVE/攻破类型/跳转关系的对应） |
+
+要求：
+- 战术 ID 须使用 Enterprise 矩阵中的 **TA** 编号（如 TA0001 Initial Access、TA0008 Lateral Movement 等）；技术须给出 **T** 编号，若有合适子技术须写出 **Txxxx.xxx**。
+- 常见对应可参考（须结合本题实际数据选用，勿机械照搬）：入口利用 Web 漏洞 → T1190 Exploit Public-Facing Application；RCE/命令执行 → T1059 Command and Scripting Interpreter；凭据/敏感文件 → T1552 Unsecured Credentials、T1083 File and Directory Discovery；内网跳转/扫描 → T1046 Network Service Discovery、T1021 Remote Services 等。
+- 若某一步可对应多条技术，可分多行或在该行「映射依据」中并列说明优先级。
+
+### 5.2 ATT&CK 战术阶段覆盖图（必填）
+
+除表格外，须再给出 **一张 Mermaid 图**（单独 ```mermaid 代码块），用于展示本次链路覆盖到的 **战术阶段** 在 kill chain 上的先后或并行关系。推荐用法之一：
+- 使用 `flowchart LR` 或 `flowchart TD`，节点为「TA 编号 + 战术简称」，边表示攻击推进顺序；或
+- 使用 `timeline` / `gantt`（若渲染环境支持）标出各战术阶段。
+
+图下用 2～4 句中文说明：覆盖了 ATT&CK 矩阵中哪些战术域、是否存在明显缺口（例如未体现持久化、命令与控制等）。
+
+### 5.3 学术化小结（必填）
+
+用一小段话归纳：本次实验/渗透路径在 ATT&CK 视角下的 **主要威胁类型** 与 **检测防护应侧重的战术层**，并注明映射基于 MITRE ATT&CK® Enterprise 框架（可在脚注或句中说明版本以 ATT&CK 官网当前 Enterprise 为准）。
 
 ## 6. 针对性防御建议
 
@@ -168,11 +191,11 @@ async def generate_attack_report(
 
 【约束】：
 - 输出必须是 Markdown 格式
-- Mermaid图必须使用 ```mermaid 代码块
-- 表格必须使用标准 Markdown 表格语法
-- 语言使用中文
+- Mermaid 图必须使用 ```mermaid 代码块；**至少两张**：一张为第 3 节攻击拓扑，一张为第 5.2 节 ATT&CK 战术阶段图
+- 表格必须使用标准 Markdown 表格语法（含第 5.1 节 ATT&CK 映射总表）
+- 语言使用中文（MITRE 官方英文战术/技术名可在括号内保留）
 - 如果 CVE 编号为空，则根据容器名称和应用推断可能的漏洞信息
-- 报告应专业、详尽、可直接用于安全审计
+- 报告应专业、详尽、可直接用于安全审计与学术文档附录
 """
 
     try:
@@ -183,7 +206,7 @@ async def generate_attack_report(
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a senior cybersecurity penetration testing expert. Generate professional, detailed attack chain reports in Chinese Markdown format. Always include Mermaid diagrams for chain visualization.",
+                    "content": "You are a senior cybersecurity penetration testing expert. Generate professional, detailed attack chain reports in Chinese Markdown. Always include: (1) a Mermaid diagram for the attack topology, (2) a MITRE ATT&CK for Enterprise mapping table with TA/T IDs, (3) a second Mermaid diagram showing covered ATT&CK tactic phases in order.",
                 },
                 {"role": "user", "content": prompt},
             ],
