@@ -1,6 +1,6 @@
 {
   "config": {
-    "enabled": false,
+    "enabled": true,
     "engine": "modsecurity",
     "aifw_port": "9999",
     "llm_api_url": "https://api.moonshot.cn/v1/chat/completions",
@@ -12,6 +12,15 @@
     "atk_llm_api_key": "66e260662fb1401b8ad8d2fa6e87350e.qDUyc5buHMd0ftMY",
     "atk_llm_model": "glm-5"
   },
-  "rules": {},
-  "next_port": 10008
+  "rules": {
+    "192.168.6.3:7860": 10001,
+    "192.168.5.3:5005": 10002,
+    "192.168.5.3:8080": 10003,
+    "192.168.6.5:7860": 10004,
+    "192.168.5.4:10086": 10005,
+    "192.168.6.6:5005": 10006,
+    "192.168.6.6:8080": 10007,
+    "192.168.5.2:7860": 10008
+  },
+  "next_port": 10009
 }

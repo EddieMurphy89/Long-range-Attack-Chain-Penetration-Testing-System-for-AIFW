@@ -50,7 +50,7 @@ if not os.path.exists(AIFW_ROOT):
 
 # Go Configuration
 # Prefer an explicit GOROOT when provided; otherwise rely on `go` from PATH.
-GO_ROOT = os.getenv("GOROOT", "") # r"F:\Go_1.23.3"
+GO_ROOT = os.getenv("GOROOT", r"F:\Go_1.23.3") # r"F:\Go_1.23.3"
 
 # LLM Configuration
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
