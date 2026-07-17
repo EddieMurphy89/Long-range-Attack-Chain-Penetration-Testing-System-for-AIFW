@@ -1,0 +1,17 @@
+{
+  "config": {
+    "enabled": false,
+    "engine": "modsecurity",
+    "aifw_port": "9999",
+    "llm_api_url": "https://api.moonshot.cn/v1/chat/completions",
+    "llm_api_key": "",
+    "llm_model": "moonshot-v1-auto",
+    "mode": "DetectionOnly",
+    "agent_enabled": false,
+    "atk_llm_api_url": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+    "atk_llm_api_key": "",
+    "atk_llm_model": "glm-5"
+  },
+  "rules": {},
+  "next_port": 10001
+}
